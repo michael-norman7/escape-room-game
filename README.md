@@ -2,10 +2,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, install react and nextjs:
+First, install required packages:
 
 ```bash
-npm install next@latest react@latest react-dom@latest
+npm i
 ```
 
 Run the development server:
