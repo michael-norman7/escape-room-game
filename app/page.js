@@ -55,6 +55,7 @@ const roomData = {
   1: { videoSrc: "rooms/Red_Flicker.mp4", objects: room1Objects },
   2: { videoSrc: "rooms/Zoom_Out.mp4", objects: [] },
   3: { videoSrc: "rooms/Red_Green_Flicker.mp4", objects: [] },
+  4: { videoSrc: "rooms/Exit_Room.mp4", objects: [] },
 };
 
 export default function Home() {
