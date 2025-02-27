@@ -52,7 +52,7 @@ const room1Objects = [
     content: {
       text: "Enter a code to unlock the safe.",
       image: "",
-      puzzle: { type: "4 digit code", code: "1000" },
+      puzzle: { type: "4 digit code", code: "1000", solved: false, reward: { name: "Safe Key", imageSrc: "items/key.png" } },
     },
   },
   {

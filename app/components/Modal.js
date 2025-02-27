@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Alert from "./Alert";
 
 export default function Modal({
   title,
@@ -8,6 +9,34 @@ export default function Modal({
   inventory,
   addToInventory,
 }) {
+  const [showPuzzle, setShowPuzzle] = useState(true);
+
+  function SolvedPuzzleReward({ reward, addToInventory, onClose }) {
+    return (
+      <div className="bg-white p-6 rounded-lg text-center">
+        <h3 className="text-xl mb-4">You found a key!</h3>
+        {!inventory.some((item) => item.name === reward.name) ? (
+          <>
+            <img
+              src={reward.imageSrc}
+              alt={reward.name}
+              className="w-32 h-auto mx-auto cursor-pointer hover:opacity-80 bg-slate-300 rounded-lg"
+              onClick={() => {
+                addToInventory(reward);
+                onClose();
+              }}
+            />
+            <p className="mt-4 text-sm">
+              Click the key to add it to your inventory
+            </p>
+          </>
+        ) : (
+          <div className="w-32 h-32 h-auto mx-auto opacity-50 bg-slate-300 rounded-lg" />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
       <div className="relative w-[75%] max-w-[900px] p-6 text-black bg-white rounded-lg max-h-[75%] min-h-72 overflow-y-auto">
@@ -41,21 +70,40 @@ export default function Modal({
             />
           </div>
         )}
-        {content.puzzle && content.puzzle.type === "4 digit code" && (
-          <FourDigitCodePuzzle
-            puzzle={content.puzzle}
-            onClose={onClose}
-            addToInventory={addToInventory}
-          />
-        )}
+        {content.puzzle &&
+          content.puzzle.type === "4 digit code" &&
+          (content.puzzle.solved ? (
+            <SolvedPuzzleReward
+              reward={content.puzzle.reward}
+              addToInventory={addToInventory}
+              onClose={onClose}
+            />
+          ) : (
+            <FourDigitCodePuzzle
+              puzzle={content.puzzle}
+              onClose={onClose}
+              addToInventory={addToInventory}
+              solved={content.puzzle.solved}
+              solvePuzzle={() => {
+                content.puzzle.solved = true;
+                setShowPuzzle(false); // Force re-render
+              }}
+            />
+          ))}
       </div>
     </div>
   );
 }
 
-function FourDigitCodePuzzle({ puzzle, onClose, addToInventory }) {
+function FourDigitCodePuzzle({
+  puzzle,
+  onClose,
+  addToInventory,
+  solved,
+  solvePuzzle,
+}) {
   const [digits, setDigits] = useState([0, 0, 0, 0]);
-  const [showKeyPopup, setShowKeyPopup] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const incrementDigit = (index) => {
     const newDigits = [...digits];
@@ -134,37 +182,19 @@ function FourDigitCodePuzzle({ puzzle, onClose, addToInventory }) {
         onClick={() => {
           const enteredCode = digits.join("");
           if (enteredCode === puzzle.code) {
-            // Show success popup with key
-            setShowKeyPopup(true);
-            // onClose();
+            console.log("Correct code!");
+            solvePuzzle();
           } else {
-            alert("Incorrect code. Try again.");
+            console.log("Incorrect code.");
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 3000);
           }
         }}
       >
         Submit Code
       </button>
 
-      {showKeyPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60">
-          <div className="bg-white p-6 rounded-lg text-center">
-            <h3 className="text-xl mb-4">You found a key!</h3>
-            <img
-              src="items/key.png"
-              alt="Key"
-              className="w-32 h-auto mx-auto cursor-pointer hover:opacity-80"
-              onClick={() => {
-                addToInventory({ name: "Safe Key", imageSrc: "items/key.png" });
-                setShowKeyPopup(false);
-                onClose();
-              }}
-            />
-            <p className="mt-4 text-sm">
-              Click the key to add it to your inventory
-            </p>
-          </div>
-        </div>
-      )}
+      {showAlert && <Alert message="Incorrect code. Try again." type="error" />}
     </div>
   );
 }
