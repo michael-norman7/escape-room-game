@@ -51,15 +51,22 @@ const room1Objects = [
 ];
 
 const roomData = {
-  0: { videoSrc: "rooms/start_page.mp4", objects: [] },
-  1: { videoSrc: "rooms/Red_Flicker.mp4", objects: room1Objects },
-  2: { videoSrc: "rooms/Zoom_Out.mp4", objects: [] },
-  3: { videoSrc: "rooms/Red_Green_Flicker.mp4", objects: [] },
-  4: { videoSrc: "rooms/Exit_Room.mp4", objects: [] },
+  0: { videoSrc: "rooms/start_page.mp4", transitionVideoSrc: "", objects: [] },
+  1: {
+    videoSrc: "rooms/Red_Flicker.mp4",
+    transitionVideoSrc: "rooms/Zoom_Out.mp4",
+    objects: room1Objects,
+  },
+  2: {
+    videoSrc: "rooms/Red_Green_Flicker.mp4",
+    transitionVideoSrc: "rooms/Exit_Room.mp4",
+    objects: [],
+  },
 };
 
 export default function Home() {
   const [currentRoom, setCurrentRoom] = useState(0);
+  const [transition, setTransition] = useState(false);
 
   const [activeObject, setActiveObject] = useState(null);
 
@@ -71,29 +78,63 @@ export default function Home() {
   ]);
 
   function handleNextRoom() {
-    if (currentRoom < Object.keys(roomData).length - 1) {
-      setCurrentRoom(currentRoom + 1);
-    } else {
-      setCurrentRoom(1);
-    }
+    if (transition) return -1;
+
     setActiveObject(null);
+
+    // transition
+    if (roomData[currentRoom].transitionVideoSrc !== "") {
+      console.log("Transitioning...");
+      setTransition(true);
+      setTimeout(() => {
+        setTransition(false);
+        setCurrentRoom(
+          Math.max((currentRoom + 1) % Object.keys(roomData).length, 1)
+        );
+        console.log("Transitioned to next room");
+      }, 7000);
+    } else {
+      if (currentRoom < Object.keys(roomData).length - 1) {
+        console.log("Next room");
+        setCurrentRoom(currentRoom + 1);
+      } else {
+        console.log("First room");
+        setCurrentRoom(1);
+      }
+    }
   }
 
   return (
     <main>
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-[1280px] h-[768px] overflow-hidden relative">
-          <video
-            key={roomData[currentRoom].videoSrc}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="object-cover w-full h-full"
-          >
-            <source src={roomData[currentRoom].videoSrc} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          {transition ? (
+            <video
+              key={roomData[currentRoom].transitionVideoSrc}
+              autoPlay
+              muted
+              playsInline
+              className="object-cover w-full h-full"
+            >
+              <source
+                src={roomData[currentRoom].transitionVideoSrc}
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <video
+              key={roomData[currentRoom].videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="object-cover w-full h-full"
+            >
+              <source src={roomData[currentRoom].videoSrc} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          )}
 
           {roomData[currentRoom].objects.map((obj) => (
             <button
