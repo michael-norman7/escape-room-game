@@ -1,6 +1,13 @@
 "use client";
+import { useState } from "react";
 
-export default function Modal({ title, content, onClose }) {
+export default function Modal({
+  title,
+  content,
+  onClose,
+  inventory,
+  addToInventory,
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
       <div className="relative w-[75%] max-w-[900px] p-6 text-black bg-white rounded-lg max-h-[75%] min-h-72 overflow-y-auto">
@@ -24,8 +31,140 @@ export default function Modal({ title, content, onClose }) {
           </svg>
         </button>
         <div className="mb-4 text-2xl font-bold">{title}</div>
-        <div className="text-xl">{content}</div>
+        {content.text && <div className="text-xl">{content.text}</div>}
+        {content.image && (
+          <div className="mt-4">
+            <img
+              src={content.image}
+              alt="Content image"
+              className="max-w-full h-auto rounded-lg mx-auto"
+            />
+          </div>
+        )}
+        {content.puzzle && content.puzzle.type === "4 digit code" && (
+          <FourDigitCodePuzzle
+            puzzle={content.puzzle}
+            onClose={onClose}
+            addToInventory={addToInventory}
+          />
+        )}
       </div>
+    </div>
+  );
+}
+
+function FourDigitCodePuzzle({ puzzle, onClose, addToInventory }) {
+  const [digits, setDigits] = useState([0, 0, 0, 0]);
+  const [showKeyPopup, setShowKeyPopup] = useState(false);
+
+  const incrementDigit = (index) => {
+    const newDigits = [...digits];
+    newDigits[index] = (newDigits[index] + 1) % 10;
+    setDigits(newDigits);
+  };
+
+  const decrementDigit = (index) => {
+    const newDigits = [...digits];
+    newDigits[index] = (newDigits[index] + 9) % 10;
+    setDigits(newDigits);
+  };
+
+  return (
+    <div className="mt-6 flex flex-col items-center">
+      <div className="flex gap-6">
+        {digits.map((digit, index) => (
+          <div key={index} className="flex flex-col items-center">
+            <button
+              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+              onClick={() => incrementDigit(index)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 15l7-7 7 7"
+                />
+              </svg>
+            </button>
+            <div
+              className={`flex items-center justify-center w-12 h-16 my-2 text-3xl font-bold ${
+                index === 0
+                  ? "bg-blue-500"
+                  : index === 1
+                    ? "bg-green-500"
+                    : index === 2
+                      ? "bg-orange-500"
+                      : "bg-red-500"
+              } rounded`}
+            >
+              {digit}
+            </div>
+            <button
+              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+              onClick={() => decrementDigit(index)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        className="px-6 py-2 mt-6 text-white bg-blue-600 rounded hover:bg-blue-700"
+        onClick={() => {
+          const enteredCode = digits.join("");
+          if (enteredCode === puzzle.code) {
+            // Show success popup with key
+            setShowKeyPopup(true);
+            // onClose();
+          } else {
+            alert("Incorrect code. Try again.");
+          }
+        }}
+      >
+        Submit Code
+      </button>
+
+      {showKeyPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60">
+          <div className="bg-white p-6 rounded-lg text-center">
+            <h3 className="text-xl mb-4">You found a key!</h3>
+            <img
+              src="items/key.png"
+              alt="Key"
+              className="w-32 h-auto mx-auto cursor-pointer hover:opacity-80"
+              onClick={() => {
+                addToInventory({ name: "Safe Key", imageSrc: "items/key.png" });
+                setShowKeyPopup(false);
+                onClose();
+              }}
+            />
+            <p className="mt-4 text-sm">
+              Click the key to add it to your inventory
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

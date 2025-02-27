@@ -9,8 +9,12 @@ const room1Objects = [
     left: "230px",
     width: "110px",
     height: "90px",
-    title: "Puzzle 1",
-    content: "This is Puzzle 1 content.",
+    title: "Left Display Case",
+    content: {
+      text: "",
+      image: "puzzles/bookshelf.png",
+      puzzle: {},
+    },
   },
   {
     id: "puzzle2",
@@ -18,8 +22,12 @@ const room1Objects = [
     left: "340px",
     width: "110px",
     height: "90px",
-    title: "Puzzle 2",
-    content: "This is Puzzle 2 content.",
+    title: "Middle Display Case",
+    content: {
+      text: "This is Middle Display Case content.",
+      image: "",
+      puzzle: {},
+    },
   },
   {
     id: "puzzle3",
@@ -27,8 +35,12 @@ const room1Objects = [
     left: "450px",
     width: "110px",
     height: "90px",
-    title: "Puzzle 3",
-    content: "This is Puzzle 3 content.",
+    title: "Right Display Case",
+    content: {
+      text: "This is Right Display Case content.",
+      image: "",
+      puzzle: {},
+    },
   },
   {
     id: "puzzle4",
@@ -36,8 +48,12 @@ const room1Objects = [
     left: "900px",
     width: "80px",
     height: "380px",
-    title: "Puzzle 4",
-    content: "This is Puzzle 4 content.",
+    title: "Wall Safe",
+    content: {
+      text: "Enter a code to unlock the safe.",
+      image: "",
+      puzzle: { type: "4 digit code", code: "1000" },
+    },
   },
   {
     id: "puzzle5",
@@ -46,7 +62,11 @@ const room1Objects = [
     width: "350px",
     height: "130px",
     title: "Puzzle 5",
-    content: "This is Puzzle 5 content.",
+    content: {
+      text: "This is Puzzle 5 content.",
+      image: "",
+      puzzle: {},
+    },
   },
 ];
 
@@ -70,12 +90,7 @@ export default function Home() {
 
   const [activeObject, setActiveObject] = useState(null);
 
-  const [inventory, setInventory] = useState([
-    { name: "Key", imageSrc: "items/key.png" },
-    { name: "6396", imageSrc: "items/note.png" },
-    { name: "Key", imageSrc: "items/key.png" },
-    { name: "0375", imageSrc: "items/note.png" },
-  ]);
+  const [inventory, setInventory] = useState([]);
 
   function handleNextRoom() {
     if (transition) return -1;
@@ -171,7 +186,7 @@ export default function Home() {
                 alt={item.name}
                 className="object-contain w-16 h-16"
               />
-              <span className="absolute bottom-0 px-2 py-1 text-white transform -translate-x-1/2 bg-gray-700 rounded-lg opacity-0 text-s translate-y-3/4 left-1/2 group-hover:opacity-100">
+              <span className="absolute bottom-0 px-2 py-1 text-white transform -translate-x-1/2 bg-gray-700 rounded-lg opacity-0 text-s translate-y-3/4 left-1/2 group-hover:opacity-100 whitespace-nowrap">
                 {item.name}
               </span>
             </div>
@@ -184,6 +199,10 @@ export default function Home() {
           title={activeObject.title}
           content={activeObject.content}
           onClose={() => setActiveObject(null)}
+          inventory={inventory}
+          addToInventory={(item) => {
+            setInventory([...inventory, item]);
+          }}
         />
       )}
     </main>
