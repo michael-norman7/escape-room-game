@@ -12,7 +12,7 @@ const room1Objects = [
     title: "Left Display Case",
     content: {
       text: "",
-      image: "puzzles/bookshelf.png",
+      image: "puzzles/display_case.png",
       puzzle: {},
     },
   },
