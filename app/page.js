@@ -13,7 +13,17 @@ const room1Objects = [
     content: {
       text: "",
       image: "puzzles/display_case.png",
-      puzzle: {},
+      puzzle: {
+        type: "locked_box",
+        solved: false,
+        key: "Safe Key",
+        id: "puzzle1_box",
+        top: "315px",
+        left: "150px",
+        width: "235px",
+        height: "180px",
+        reward: { name: "Cipher", imageSrc: "items/note.png" },
+      },
     },
   },
   {
@@ -52,7 +62,12 @@ const room1Objects = [
     content: {
       text: "Enter a code to unlock the safe.",
       image: "",
-      puzzle: { type: "4 digit code", code: "6396", solved: false, reward: { name: "Safe Key", imageSrc: "items/key.png" } },
+      puzzle: {
+        type: "4 digit code",
+        code: "6396",
+        solved: false,
+        reward: { name: "Safe Key", imageSrc: "items/key.png" },
+      },
     },
   },
   {

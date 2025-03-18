@@ -10,11 +10,10 @@ export default function Modal({
   addToInventory,
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
-
   function SolvedPuzzleReward({ reward, addToInventory, onClose }) {
     return (
       <div className="bg-white p-6 rounded-lg text-center">
-        <h3 className="text-xl mb-4">You found a key!</h3>
+        <h3 className="text-xl mb-4">You found a {reward.name}!</h3>
         {!inventory.some((item) => item.name === reward.name) ? (
           <>
             <img
@@ -60,16 +59,24 @@ export default function Modal({
           </svg>
         </button>
         <div className="mb-4 text-2xl font-bold">{title}</div>
+
+        {/* Text */}
         {content.text && <div className="text-xl">{content.text}</div>}
+
+        {/* Image */}
         {content.image && (
           <div className="mt-4">
             <img
               src={content.image}
               alt="Content image"
+              width={700}
+              height={700}
               className="max-w-full h-auto rounded-lg mx-auto"
             />
           </div>
         )}
+
+        {/* 4 digit code Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "4 digit code" &&
           (content.puzzle.solved ? (
@@ -81,9 +88,26 @@ export default function Modal({
           ) : (
             <FourDigitCodePuzzle
               puzzle={content.puzzle}
-              onClose={onClose}
+              solvePuzzle={() => {
+                content.puzzle.solved = true;
+                setShowPuzzle(false); // Force re-render
+              }}
+            />
+          ))}
+
+        {/* Locked box Puzzle */}
+        {content.puzzle &&
+          content.puzzle.type === "locked_box" &&
+          (content.puzzle.solved ? (
+            <SolvedPuzzleReward
+              reward={content.puzzle.reward}
               addToInventory={addToInventory}
-              solved={content.puzzle.solved}
+              onClose={onClose}
+            />
+          ) : (
+            <LockedBoxPuzzle
+              puzzle={content.puzzle}
+              hasKey={inventory.some((item) => item.name === "Safe Key")}
               solvePuzzle={() => {
                 content.puzzle.solved = true;
                 setShowPuzzle(false); // Force re-render
@@ -95,13 +119,44 @@ export default function Modal({
   );
 }
 
-function FourDigitCodePuzzle({
-  puzzle,
-  onClose,
-  addToInventory,
-  solved,
-  solvePuzzle,
-}) {
+function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
+  const [showAlert, setShowAlert] = useState(false);
+
+  return (
+    <div className="mt-6 flex flex-col items-center">
+      <button
+        key={puzzle.id}
+        onClick={() => {
+          if (hasKey) {
+            solvePuzzle();
+          } else {
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 3000);
+          }
+        }}
+        style={{
+          position: "absolute",
+          top: puzzle.top,
+          left: puzzle.left,
+          width: puzzle.width,
+          height: puzzle.height,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
+      />
+
+      {showAlert && (
+        <Alert
+          message="You need the correct key to unlock this box."
+          type="error"
+        />
+      )}
+    </div>
+  );
+}
+
+function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
   const [digits, setDigits] = useState([0, 0, 0, 0]);
   const [showAlert, setShowAlert] = useState(false);
 
