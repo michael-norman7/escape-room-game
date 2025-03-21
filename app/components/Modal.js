@@ -155,10 +155,13 @@ function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
     </div>
   );
 }
-
 function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
   const [digits, setDigits] = useState([0, 0, 0, 0]);
   const [showAlert, setShowAlert] = useState(false);
+
+  if (!puzzle.colors) {
+    puzzle.colors = ["", "", "", ""];
+  }
 
   const incrementDigit = (index) => {
     const newDigits = [...digits];
@@ -170,6 +173,21 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
     const newDigits = [...digits];
     newDigits[index] = (newDigits[index] + 9) % 10;
     setDigits(newDigits);
+  };
+
+  const getColorClass = (color) => {
+    switch (color) {
+      case "blue":
+        return "bg-blue-500";
+      case "green":
+        return "bg-green-500";
+      case "orange":
+        return "bg-orange-500";
+      case "red":
+        return "bg-red-500";
+      default:
+        return "bg-gray-300";
+    }
   };
 
   return (
@@ -197,15 +215,7 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
               </svg>
             </button>
             <div
-              className={`flex items-center justify-center w-12 h-16 my-2 text-3xl font-bold ${
-                index === 0
-                  ? "bg-blue-500"
-                  : index === 1
-                    ? "bg-green-500"
-                    : index === 2
-                      ? "bg-orange-500"
-                      : "bg-red-500"
-              } rounded`}
+              className={`flex items-center justify-center w-12 h-16 my-2 text-3xl font-bold ${getColorClass(puzzle.colors[index])} rounded`}
             >
               {digit}
             </div>
