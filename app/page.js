@@ -4,7 +4,7 @@ import Modal from "./components/Modal";
 
 const room1Objects = [
   {
-    id: "puzzle1",
+    id: "lockedBoxDisplayCase",
     top: "420px",
     left: "230px",
     width: "110px",
@@ -27,33 +27,46 @@ const room1Objects = [
     },
   },
   {
-    id: "puzzle2",
+    id: "vaseDisplayCase",
     top: "420px",
     left: "340px",
     width: "110px",
     height: "90px",
     title: "Middle Display Case",
     content: {
-      text: "This is Middle Display Case content.",
-      image: "",
+      text: "",
+      image: "puzzles/vase_display_case.png",
       puzzle: {},
     },
   },
   {
-    id: "puzzle3",
+    id: "statueDisplayCase",
     top: "420px",
     left: "450px",
     width: "110px",
     height: "90px",
     title: "Right Display Case",
     content: {
-      text: "This is Right Display Case content.",
-      image: "",
+      text: "",
+      image: "puzzles/statue_display_case.png",
       puzzle: {},
     },
   },
   {
-    id: "puzzle4",
+    id: "painting",
+    top: "165px",
+    left: "300px",
+    width: "200px",
+    height: "250px",
+    title: "Painting",
+    content: {
+      text: "",
+      image: "puzzles/painting.png",
+      puzzle: {},
+    },
+  },
+  {
+    id: "wallSafe",
     top: "350px",
     left: "900px",
     width: "80px",
@@ -65,8 +78,12 @@ const room1Objects = [
       puzzle: {
         type: "4 digit code",
         code: "6396",
+        colors: ["blue", "green", "orange", "red"],
         solved: false,
-        reward: { name: "Safe Key", imageSrc: "items/key.png" },
+        reward: [
+          { name: "Safe Key", imageSrc: "items/key.png" },
+          { name: "Cipher", imageSrc: "items/note.png" },
+        ],
       },
     },
   },

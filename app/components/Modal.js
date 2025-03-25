@@ -11,27 +11,41 @@ export default function Modal({
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
   function SolvedPuzzleReward({ reward, addToInventory, onClose }) {
+    // Convert single reward to array if it's not already
+    const rewards = Array.isArray(reward) ? reward : [reward];
+
     return (
       <div className="bg-white p-6 rounded-lg text-center">
-        <h3 className="text-xl mb-4">You found a {reward.name}!</h3>
-        {!inventory.some((item) => item.name === reward.name) ? (
-          <>
-            <img
-              src={reward.imageSrc}
-              alt={reward.name}
-              className="w-32 h-auto mx-auto cursor-pointer hover:opacity-80 bg-slate-300 rounded-lg"
-              onClick={() => {
-                addToInventory(reward);
-                onClose();
-              }}
-            />
-            <p className="mt-4 text-sm">
-              Click the key to add it to your inventory
-            </p>
-          </>
-        ) : (
-          <div className="w-32 h-32 h-auto mx-auto opacity-50 bg-slate-300 rounded-lg" />
-        )}
+        <h3 className="text-xl mb-4">You found something!</h3>
+
+        <div className="flex flex-wrap justify-center gap-4">
+          {rewards.map((item, index) => (
+            <div key={index} className="flex flex-col items-center">
+              {!inventory.some(
+                (inventoryItem) => inventoryItem.name === item.name
+              ) ? (
+                <>
+                  <img
+                    src={item.imageSrc}
+                    alt={item.name}
+                    className="w-24 h-24 object-contain cursor-pointer hover:opacity-80 bg-slate-300 rounded-lg"
+                    onClick={() => {
+                      addToInventory(item);
+                    }}
+                  />
+                  <p className="mt-2 text-sm">{item.name}</p>
+                </>
+              ) : (
+                <>
+                  <div className="w-24 h-24 opacity-50 bg-slate-300 rounded-lg" />
+                  <p className="mt-2 text-sm text-gray-500">
+                    {item.name} (collected)
+                  </p>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -59,7 +73,6 @@ export default function Modal({
           </svg>
         </button>
         <div className="mb-4 text-2xl font-bold">{title}</div>
-
         {/* Text */}
         {content.text && <div className="text-xl">{content.text}</div>}
 
@@ -69,13 +82,10 @@ export default function Modal({
             <img
               src={content.image}
               alt="Content image"
-              width={700}
-              height={700}
-              className="max-w-full h-auto rounded-lg mx-auto"
+              className="max-w-[700px] max-h-[700px] w-auto h-auto rounded-lg mx-auto object-contain"
             />
           </div>
         )}
-
         {/* 4 digit code Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "4 digit code" &&
@@ -94,7 +104,6 @@ export default function Modal({
               }}
             />
           ))}
-
         {/* Locked box Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "locked_box" &&
@@ -147,10 +156,7 @@ function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
       />
 
       {showAlert && (
-        <Alert
-          message="You need the correct key to unlock this box."
-          type="error"
-        />
+        <Alert message="You need a key to open this box." type="error" />
       )}
     </div>
   );
