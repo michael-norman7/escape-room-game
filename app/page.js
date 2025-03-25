@@ -1,6 +1,21 @@
 "use client";
 import { useState } from "react";
 import Modal from "./components/Modal";
+import InventoryDetailModal from "./components/InventoryDetailModal";
+
+const inventoryItems = {
+  "Safe Key": { name: "Safe Key", imageSrc: "items/key.png" },
+  Cipher: {
+    name: "Cipher",
+    imageSrc: "items/note.png",
+    detailImageSrc: "items/cipher_decoder.png",
+  },
+  Cipher2: {
+    name: "Cipher2",
+    imageSrc: "items/note.png",
+    detailImageSrc: "items/cipher_decoder.png",
+  },
+};
 
 const room1Objects = [
   {
@@ -22,7 +37,7 @@ const room1Objects = [
         left: "150px",
         width: "235px",
         height: "180px",
-        reward: { name: "Cipher", imageSrc: "items/note.png" },
+        reward: inventoryItems["Cipher"],
       },
     },
   },
@@ -80,10 +95,7 @@ const room1Objects = [
         code: "6396",
         colors: ["blue", "green", "orange", "red"],
         solved: false,
-        reward: [
-          { name: "Safe Key", imageSrc: "items/key.png" },
-          { name: "Cipher", imageSrc: "items/note.png" },
-        ],
+        reward: [inventoryItems["Safe Key"], inventoryItems["Cipher2"]],
       },
     },
   },
@@ -121,6 +133,7 @@ export default function Home() {
   const [transition, setTransition] = useState(false);
 
   const [activeObject, setActiveObject] = useState(null);
+  const [activeInventoryItem, setActiveInventoryItem] = useState(null);
 
   const [inventory, setInventory] = useState([]);
 
@@ -216,7 +229,8 @@ export default function Home() {
               <img
                 src={item.imageSrc}
                 alt={item.name}
-                className="object-contain w-16 h-16"
+                className="object-contain w-16 h-16 cursor-pointer"
+                onClick={() => setActiveInventoryItem(item)}
               />
               <span className="absolute bottom-0 px-2 py-1 text-white transform -translate-x-1/2 bg-gray-700 rounded-lg opacity-0 text-s translate-y-3/4 left-1/2 group-hover:opacity-100 whitespace-nowrap">
                 {item.name}
@@ -235,6 +249,13 @@ export default function Home() {
           addToInventory={(item) => {
             setInventory([...inventory, item]);
           }}
+        />
+      )}
+
+      {activeInventoryItem && activeInventoryItem.detailImageSrc && (
+        <InventoryDetailModal
+          item={activeInventoryItem}
+          onClose={() => setActiveInventoryItem(null)}
         />
       )}
     </main>

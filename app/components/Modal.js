@@ -52,7 +52,7 @@ export default function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-      <div className="relative w-[75%] max-w-[900px] p-6 text-black bg-white rounded-lg max-h-[75%] min-h-72 overflow-y-auto">
+      <div className="relative w-[75%] max-w-[900px] p-6 text-black bg-white rounded-lg max-h-[750px] min-h-72 overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute p-2 text-black bg-gray-300 rounded-lg top-4 right-4"
@@ -73,6 +73,7 @@ export default function Modal({
           </svg>
         </button>
         <div className="mb-4 text-2xl font-bold">{title}</div>
+
         {/* Text */}
         {content.text && <div className="text-xl">{content.text}</div>}
 
@@ -82,10 +83,11 @@ export default function Modal({
             <img
               src={content.image}
               alt="Content image"
-              className="max-w-[700px] max-h-[700px] w-auto h-auto rounded-lg mx-auto object-contain"
+              className="max-w-[700px] max-h-[650px] w-auto h-auto rounded-lg mx-auto object-contain"
             />
           </div>
         )}
+
         {/* 4 digit code Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "4 digit code" &&
@@ -104,6 +106,7 @@ export default function Modal({
               }}
             />
           ))}
+
         {/* Locked box Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "locked_box" &&
