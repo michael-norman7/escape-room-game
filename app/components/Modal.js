@@ -159,7 +159,7 @@ function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
       />
 
       {showAlert && (
-        <Alert message="You need a key to open this box." type="error" />
+        <Alert message={puzzle.hint} type="info" />
       )}
     </div>
   );
