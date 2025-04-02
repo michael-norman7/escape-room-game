@@ -11,12 +11,25 @@ export default function Modal({
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
   function SolvedPuzzleReward({ reward, addToInventory, onClose }) {
+    // Handle null or undefined reward
+    if (!reward) {
+      return <></>;
+    }
+
     // Convert single reward to array if it's not already
     const rewards = Array.isArray(reward) ? reward : [reward];
 
+    console.log("Rewards:", rewards);
     return (
       <div className="bg-white p-6 rounded-lg text-center">
-        <h3 className="text-xl mb-4">You found something!</h3>
+        {rewards.length === 1 && rewards[0].name === "Cipher" ? (
+          <h3 className="text-xl mb-4">
+            You now notice that the tile directly below the column on the right
+            looks more worn out than the rest of the tiles.
+          </h3>
+        ) : (
+          <h3 className="text-xl mb-4">You found something!</h3>
+        )}
 
         <div className="flex flex-wrap justify-center gap-4">
           {rewards.map((item, index) => (
@@ -73,10 +86,8 @@ export default function Modal({
           </svg>
         </button>
         <div className="mb-4 text-2xl font-bold">{title}</div>
-
         {/* Text */}
         {content.text && <div className="text-xl">{content.text}</div>}
-
         {/* Image */}
         {content.image && (
           <div className="mt-4">
@@ -87,7 +98,6 @@ export default function Modal({
             />
           </div>
         )}
-
         {/* 4 digit code Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "4 digit code" &&
@@ -119,7 +129,10 @@ export default function Modal({
           ) : (
             <LockedBoxPuzzle
               puzzle={content.puzzle}
-              hasKey={inventory.some((item) => item.name === "Safe Key")}
+              hasKey={
+                content.puzzle.key === null ||
+                inventory.some((item) => item.name === content.puzzle.key)
+              }
               solvePuzzle={() => {
                 content.puzzle.solved = true;
                 setShowPuzzle(false); // Force re-render
@@ -158,12 +171,11 @@ function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
         }}
       />
 
-      {showAlert && (
-        <Alert message={puzzle.hint} type="info" />
-      )}
+      {showAlert && <Alert message={puzzle.hint} type="info" />}
     </div>
   );
 }
+
 function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
   const [digits, setDigits] = useState([0, 0, 0, 0]);
   const [showAlert, setShowAlert] = useState(false);

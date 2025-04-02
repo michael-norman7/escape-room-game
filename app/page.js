@@ -3,179 +3,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "./components/Modal";
 import InventoryDetailModal from "./components/InventoryDetailModal";
 import Alert from "./components/Alert";
-
-const inventoryItems = {
-  "Safe Key": { name: "Safe Key", imageSrc: "items/key.png" },
-  Cipher: {
-    name: "Cipher",
-    imageSrc: "items/note.png",
-    detailImageSrc: "items/cipher_decoder.png",
-  },
-  Cipher2: {
-    name: "Cipher2",
-    imageSrc: "items/note.png",
-    detailImageSrc: "items/cipher_decoder.png",
-  },
-  "Statue Arm": {
-    name: "Statue Arm",
-    imageSrc: "items/statue_arm.png",
-  },
-  "Bionic Eye": {
-    name: "Bionic Eye",
-    imageSrc: "items/bionic_eye.png",
-  },
-  Crowbar: {
-    name: "Crowbar",
-    imageSrc: "items/crowbar.png",
-  },
-};
-
-const room1Objects = [
-  {
-    id: "lockedBoxDisplayCase",
-    top: "420px",
-    left: "230px",
-    width: "110px",
-    height: "90px",
-    title: "Left Display Case",
-    content: {
-      text: "",
-      image: "puzzles/display_case.png",
-      puzzle: {
-        type: "locked_box",
-        solved: false,
-        key: "Safe Key",
-        id: "puzzle1_box",
-        top: "315px",
-        left: "150px",
-        width: "235px",
-        height: "180px",
-        hint: "You need a key to open this box.",
-        reward: inventoryItems["Cipher"],
-      },
-    },
-  },
-  {
-    id: "vaseDisplayCase",
-    top: "420px",
-    left: "340px",
-    width: "110px",
-    height: "90px",
-    title: "Middle Display Case",
-    content: {
-      text: "",
-      image: "puzzles/vase_display_case.png",
-      puzzle: {
-        type: "locked_box",
-        solved: false,
-        key: null,
-        id: "puzzle2_box",
-        top: "150px",
-        left: "400px",
-        width: "265px",
-        height: "350px",
-        hint: "What could those letters possibly mean?",
-        reward: null,
-      },
-    },
-  },
-  {
-    id: "statueDisplayCase",
-    top: "420px",
-    left: "450px",
-    width: "110px",
-    height: "90px",
-    title: "Right Display Case",
-    content: {
-      text: "",
-      image: "puzzles/statue_display_case.png",
-      puzzle: {
-        type: "locked_box",
-        solved: false,
-        key: "Statue Arm",
-        id: "statue",
-        top: "165px",
-        left: "475px",
-        width: "225px",
-        height: "325px",
-        hint: "Strange. It looks like someone broke the arms off of this.",
-        reward: inventoryItems["Bionic Eye"],
-      },
-    },
-  },
-  {
-    id: "painting",
-    top: "165px",
-    left: "300px",
-    width: "200px",
-    height: "250px",
-    title: "Painting",
-    key: "Crowbar",
-    hint: "It feels like you could pull this painting off the wall but you are not strong enough to do it.",
-    content: {
-      text: "",
-      image: "puzzles/painting.png",
-      puzzle: {
-        type: "locked_box",
-        solved: false,
-        key: null,
-        id: "books",
-        top: "325px",
-        left: "305px",
-        width: "150px",
-        height: "120px",
-        hint: "",
-        reward: inventoryItems["Key Card"],
-      },
-    },
-  },
-  {
-    id: "wallSafe",
-    top: "350px",
-    left: "900px",
-    width: "80px",
-    height: "380px",
-    title: "Wall Safe",
-    content: {
-      text: "Enter a code to unlock the safe.",
-      image: "",
-      puzzle: {
-        type: "4 digit code",
-        code: "6396",
-        colors: ["blue", "green", "orange", "red"],
-        solved: false,
-        reward: [inventoryItems["Safe Key"], inventoryItems["Cipher2"]],
-      },
-    },
-  },
-  {
-    id: "puzzle5",
-    top: "640px",
-    left: "100px",
-    width: "350px",
-    height: "130px",
-    title: "Puzzle 5",
-    content: {
-      text: "This is Puzzle 5 content.",
-      image: "",
-      puzzle: {},
-    },
-  },
-];
-
-const roomData = {
-  0: { videoSrc: "rooms/start_page.mp4", transitionVideoSrc: "", objects: [] },
-  1: {
-    videoSrc: "rooms/Red_Flicker.mp4",
-    transitionVideoSrc: "rooms/Zoom_Out.mp4",
-    objects: room1Objects,
-  },
-  2: {
-    videoSrc: "rooms/Red_Green_Flicker.mp4",
-    transitionVideoSrc: "rooms/Exit_Room.mp4",
-    objects: [],
-  },
-};
+import { inventoryItems, room1Objects } from "./data/roomObjects";
 
 export default function Home() {
   const [currentRoom, setCurrentRoom] = useState(0);
@@ -186,7 +14,7 @@ export default function Home() {
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState("info");
 
-  const [inventory, setInventory] = useState([inventoryItems["Crowbar"]]);
+  const [inventory, setInventory] = useState([]);
 
   // Function to check if the user has a specific key
   const hasKey = (keyName) => {
@@ -254,6 +82,24 @@ export default function Home() {
     }
   }
 
+  const roomData = {
+    0: {
+      videoSrc: "rooms/start_page.mp4",
+      transitionVideoSrc: "",
+      objects: [],
+    },
+    1: {
+      videoSrc: "rooms/Red_Flicker.mp4",
+      transitionVideoSrc: "rooms/Zoom_Out.mp4",
+      objects: room1Objects,
+    },
+    2: {
+      videoSrc: "rooms/Red_Green_Flicker.mp4",
+      transitionVideoSrc: "rooms/Exit_Room.mp4",
+      objects: [],
+    },
+  };
+
   // Clear any active alert timeout when component unmounts
   useEffect(() => {
     return () => {
@@ -298,6 +144,7 @@ export default function Home() {
             </video>
           )}
 
+          {/* Overlay for the first room */}
           {currentRoom === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="p-8 bg-black bg-opacity-70 rounded-lg text-white max-w-2xl text-center mb-8">
@@ -321,28 +168,35 @@ export default function Home() {
               </button>
             </div>
           ) : (
-            roomData[currentRoom].objects.map((obj) => (
-              <button
-                key={obj.id}
-                onClick={() => handleObjectClick(obj)}
-                style={{
-                  position: "absolute",
-                  top: obj.top,
-                  left: obj.left,
-                  width: obj.width,
-                  height: obj.height,
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              />
-            ))
+            roomData[currentRoom].objects
+              .filter(
+                (obj) =>
+                  !obj.hiddenBy ||
+                  inventory.some((item) => item.name === obj.hiddenBy.name)
+              )
+              .map((obj) => (
+                <button
+                  key={obj.id}
+                  onClick={() => handleObjectClick(obj)}
+                  style={{
+                    position: "absolute",
+                    top: obj.top,
+                    left: obj.left,
+                    width: obj.width,
+                    height: obj.height,
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                />
+              ))
           )}
         </div>
       </div>
 
+      {/* Inventory bar */}
       {currentRoom !== 0 && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-300 rounded-lg w-[500px] h-20">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-300 rounded-lg w-[700px] h-20">
           <div className="flex items-center justify-center h-full space-x-4">
             {inventory.map((item, index) => (
               <div key={index} className="relative group">
@@ -361,6 +215,7 @@ export default function Home() {
         </div>
       )}
 
+      {/* Modal for room objects */}
       {activeObject && (
         <Modal
           title={activeObject.title}
@@ -374,6 +229,7 @@ export default function Home() {
         />
       )}
 
+      {/* Modal for inventory item details */}
       {activeInventoryItem && activeInventoryItem.detailImageSrc && (
         <InventoryDetailModal
           item={activeInventoryItem}
