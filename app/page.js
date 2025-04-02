@@ -119,11 +119,11 @@ const room1Objects = [
         type: "locked_box",
         solved: false,
         key: null,
-        id: "statue",
-        top: "165px",
-        left: "475px",
-        width: "225px",
-        height: "325px",
+        id: "books",
+        top: "325px",
+        left: "305px",
+        width: "150px",
+        height: "120px",
         hint: "",
         reward: inventoryItems["Key Card"],
       },
@@ -186,7 +186,7 @@ export default function Home() {
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState("info");
 
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState([inventoryItems["Crowbar"]]);
 
   // Function to check if the user has a specific key
   const hasKey = (keyName) => {
