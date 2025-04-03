@@ -8,9 +8,10 @@ export default function Modal({
   onClose,
   inventory,
   addToInventory,
+  handleNextRoom,
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
-  function SolvedPuzzleReward({ reward, addToInventory, onClose }) {
+  function SolvedPuzzleReward({ reward, addToInventory }) {
     // Handle null or undefined reward
     if (!reward) {
       return <></>;
@@ -22,14 +23,7 @@ export default function Modal({
     console.log("Rewards:", rewards);
     return (
       <div className="bg-white p-6 rounded-lg text-center">
-        {rewards.length === 1 && rewards[0].name === "Cipher" ? (
-          <h3 className="text-xl mb-4">
-            You now notice that the tile directly below the column on the right
-            looks more worn out than the rest of the tiles.
-          </h3>
-        ) : (
-          <h3 className="text-xl mb-4">You found something!</h3>
-        )}
+        <h3 className="text-xl mb-4">You found something!</h3>
 
         <div className="flex flex-wrap justify-center gap-4">
           {rewards.map((item, index) => (
@@ -98,6 +92,29 @@ export default function Modal({
             />
           </div>
         )}
+
+        {/* Terminal Security Puzzle */}
+        {content.puzzle &&
+          content.puzzle.type === "terminal_security" &&
+          (content.puzzle.solved ? (
+            <div className="mt-6 text-center">
+              <div className="p-4 bg-green-100 text-green-800 rounded-lg">
+                {content.puzzle.messages.success}
+              </div>
+            </div>
+          ) : (
+            <TerminalPuzzle
+              puzzle={content.puzzle}
+              inventory={inventory}
+              solvePuzzle={() => {
+                content.puzzle.solved = true;
+                setShowPuzzle(false); // Force re-render
+              }}
+              onClose={onClose}
+              handleNextRoom={handleNextRoom}
+            />
+          ))}
+
         {/* 4 digit code Puzzle */}
         {content.puzzle &&
           content.puzzle.type === "4 digit code" &&
@@ -105,7 +122,6 @@ export default function Modal({
             <SolvedPuzzleReward
               reward={content.puzzle.reward}
               addToInventory={addToInventory}
-              onClose={onClose}
             />
           ) : (
             <FourDigitCodePuzzle
@@ -124,7 +140,6 @@ export default function Modal({
             <SolvedPuzzleReward
               reward={content.puzzle.reward}
               addToInventory={addToInventory}
-              onClose={onClose}
             />
           ) : (
             <LockedBoxPuzzle
@@ -140,6 +155,108 @@ export default function Modal({
             />
           ))}
       </div>
+    </div>
+  );
+}
+
+function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoom }) {
+  const hasBionicEye = inventory.some((item) => item.name === "Bionic Eye");
+  const hasKeyCard = inventory.some((item) => item.name === "Key Card");
+  const [eyeAccepted, setEyeAccepted] = useState(false);
+  const [cardAccepted, setCardAccepted] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  let messageToShow = "";
+  if (hasBionicEye && hasKeyCard) {
+    messageToShow = puzzle.messages.success;
+  } else if (hasBionicEye && !hasKeyCard) {
+    messageToShow = puzzle.messages.bionicEyeNoKeyCard;
+  } else if (!hasBionicEye && hasKeyCard) {
+    messageToShow = puzzle.messages.noBionicEyeKeyCard;
+  } else {
+    messageToShow = puzzle.messages.noBionicEyeNoKeyCard;
+  }
+
+  const handleScannerClick = (scannerType) => {
+    if (scannerType === "optical") {
+      if (hasBionicEye) {
+        setAlertMessage("The eye scanner glows green with approval.");
+        setEyeAccepted(true);
+      } else {
+        setAlertMessage("The optical scanner needs a compatible bionic eye.");
+      }
+    } else if (scannerType === "card") {
+      if (hasKeyCard) {
+        setAlertMessage("The card scanner accepts your key card.");
+        setCardAccepted(true);
+      } else {
+        setAlertMessage("The card scanner is waiting for a key card.");
+      }
+    }
+
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
+  const handleTerminalAccess = () => {
+    solvePuzzle(); // Mark puzzle as solved
+    
+    // Short delay before closing modal and transitioning
+    setTimeout(() => {
+      onClose(); // Close the modal
+      handleNextRoom(); // Trigger room transition
+    }, 500);
+  };
+
+  return (
+    <div className="mt-6 flex flex-col items-center">
+      <div className="p-4 bg-gray-100 text-gray-800 rounded-lg max-w-2xl text-center">
+        {messageToShow}
+      </div>
+
+      {/* Optical Scanner Button */}
+      <button
+        onClick={() => handleScannerClick("optical")}
+        style={{
+          position: "absolute",
+          top: puzzle.messages.opticalScannerPosition.top,
+          left: puzzle.messages.opticalScannerPosition.left,
+          width: puzzle.messages.opticalScannerPosition.width,
+          height: puzzle.messages.opticalScannerPosition.height,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
+        aria-label="Optical Scanner"
+      />
+
+      {/* Card Scanner Button */}
+      <button
+        onClick={() => handleScannerClick("card")}
+        style={{
+          position: "absolute",
+          top: puzzle.messages.cardScannerPosition.top,
+          left: puzzle.messages.cardScannerPosition.left,
+          width: puzzle.messages.cardScannerPosition.width,
+          height: puzzle.messages.cardScannerPosition.height,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
+        aria-label="Card Scanner"
+      />
+
+      {eyeAccepted && cardAccepted && (
+        <button
+          className="px-6 py-2 mt-6 text-white bg-green-600 rounded hover:bg-green-700"
+          onClick={handleTerminalAccess}
+        >
+          Access Terminal
+        </button>
+      )}
+
+      {showAlert && <Alert message={alertMessage} type="info" />}
     </div>
   );
 }
@@ -161,10 +278,10 @@ function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
         }}
         style={{
           position: "absolute",
-          top: puzzle.top,
-          left: puzzle.left,
-          width: puzzle.width,
-          height: puzzle.height,
+          top: puzzle.position.top,
+          left: puzzle.position.left,
+          width: puzzle.position.width,
+          height: puzzle.position.height,
           background: "transparent",
           border: "none",
           cursor: "pointer",

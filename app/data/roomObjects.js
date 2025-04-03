@@ -19,17 +19,14 @@ export const inventoryItems = {
   },
   "Mysterious Piece": {
     name: "Mysterious Piece",
-    imageSrc: "items/statue_arm.png",
+    imageSrc: "items/mysterious_piece.png",
   },
 };
 
 export const room1Objects = [
   {
     id: "lockedBoxDisplayCase",
-    top: "420px",
-    left: "230px",
-    width: "110px",
-    height: "90px",
+    position: { top: "420px", left: "230px", width: "110px", height: "90px" },
     title: "Left Display Case",
     content: {
       text: "",
@@ -39,10 +36,12 @@ export const room1Objects = [
         solved: false,
         key: "Safe Key",
         id: "puzzle1_box",
-        top: "315px",
-        left: "150px",
-        width: "235px",
-        height: "180px",
+        position: {
+          top: "315px",
+          left: "150px",
+          width: "235px",
+          height: "180px",
+        },
         hint: "You need a key to open this box.",
         reward: inventoryItems["Cipher"],
       },
@@ -50,10 +49,7 @@ export const room1Objects = [
   },
   {
     id: "vaseDisplayCase",
-    top: "420px",
-    left: "340px",
-    width: "110px",
-    height: "90px",
+    position: { top: "420px", left: "340px", width: "110px", height: "90px" },
     title: "Middle Display Case",
     content: {
       text: "",
@@ -63,10 +59,12 @@ export const room1Objects = [
         solved: false,
         key: "none",
         id: "puzzle2_box",
-        top: "150px",
-        left: "400px",
-        width: "265px",
-        height: "350px",
+        position: {
+          top: "150px",
+          left: "400px",
+          width: "265px",
+          height: "350px",
+        },
         hint: "What could those letters possibly mean?",
         reward: null,
       },
@@ -74,10 +72,7 @@ export const room1Objects = [
   },
   {
     id: "statueDisplayCase",
-    top: "420px",
-    left: "450px",
-    width: "110px",
-    height: "90px",
+    position: { top: "420px", left: "450px", width: "110px", height: "90px" },
     title: "Right Display Case",
     content: {
       text: "",
@@ -87,10 +82,12 @@ export const room1Objects = [
         solved: false,
         key: "Mysterious Piece",
         id: "statue",
-        top: "165px",
-        left: "475px",
-        width: "225px",
-        height: "325px",
+        position: {
+          top: "165px",
+          left: "475px",
+          width: "225px",
+          height: "325px",
+        },
         hint: "Strange. It looks like someone broke the arms off of this.",
         reward: inventoryItems["Bionic Eye"],
       },
@@ -98,10 +95,7 @@ export const room1Objects = [
   },
   {
     id: "painting",
-    top: "165px",
-    left: "300px",
-    width: "200px",
-    height: "250px",
+    position: { top: "165px", left: "300px", width: "200px", height: "250px" },
     title: "Painting",
     key: "Crowbar",
     hint: "It feels like you could pull this painting off the wall but you are not strong enough to do it.",
@@ -113,10 +107,12 @@ export const room1Objects = [
         solved: false,
         key: null,
         id: "books",
-        top: "325px",
-        left: "305px",
-        width: "150px",
-        height: "120px",
+        position: {
+          top: "325px",
+          left: "305px",
+          width: "150px",
+          height: "120px",
+        },
         hint: "",
         reward: inventoryItems["Key Card"],
       },
@@ -124,10 +120,7 @@ export const room1Objects = [
   },
   {
     id: "wallSafe",
-    top: "350px",
-    left: "900px",
-    width: "80px",
-    height: "380px",
+    position: { top: "350px", left: "900px", width: "80px", height: "380px" },
     title: "Wall Safe",
     content: {
       text: "Enter a code to unlock the safe.",
@@ -146,10 +139,7 @@ export const room1Objects = [
   },
   {
     id: "looseTile",
-    top: "565px",
-    left: "550px",
-    width: "75px",
-    height: "50px",
+    position: { top: "565px", left: "550px", width: "75px", height: "50px" },
     title: "Loose Tile",
     hiddenBy: inventoryItems["Cipher"],
     content: {
@@ -160,10 +150,7 @@ export const room1Objects = [
         solved: true,
         key: null,
         id: "crowbar",
-        top: "0px",
-        left: "0px",
-        width: "0px",
-        height: "0px",
+        position: { top: "0px", left: "0px", width: "0px", height: "0px" },
         hint: "",
         reward: inventoryItems["Crowbar"],
       },
@@ -171,15 +158,37 @@ export const room1Objects = [
   },
   {
     id: "terminal",
-    top: "640px",
-    left: "100px",
-    width: "350px",
-    height: "130px",
+    position: { top: "640px", left: "100px", width: "350px", height: "130px" },
     title: "Terminal",
     content: {
-      text: "This is the Terminal.",
-      image: "",
-      puzzle: {},
+      text: "Security Terminal",
+      image: "puzzles/terminal.png",
+      puzzle: {
+        type: "terminal_security",
+        solved: false,
+        requiredItems: ["Bionic Eye", "Key Card"],
+        messages: {
+          noBionicEyeNoKeyCard:
+            "Hmmmm it looks like this security terminal requires both an optic scanner and a keycard!",
+          bionicEyeNoKeyCard:
+            "The eye scanner lights up green but it looks like this has two layers of security!",
+          noBionicEyeKeyCard: "The terminal won't open without a keycard",
+          success:
+            "The terminal allowed access and it looks like some of the lasers went off…",
+          opticalScannerPosition: {
+            top: "200px",
+            left: "580px",
+            width: "125px",
+            height: "100px",
+          },
+          cardScannerPosition: {
+            top: "340px",
+            left: "580px",
+            width: "125px",
+            height: "100px",
+          },
+        },
+      },
     },
   },
 ];

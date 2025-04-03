@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal from "./components/Modal";
 import InventoryDetailModal from "./components/InventoryDetailModal";
 import Alert from "./components/Alert";
@@ -8,6 +8,9 @@ import { inventoryItems, room1Objects } from "./data/roomObjects";
 export default function Home() {
   const [currentRoom, setCurrentRoom] = useState(0);
   const [transition, setTransition] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef(null);
 
   const [activeObject, setActiveObject] = useState(null);
   const [activeInventoryItem, setActiveInventoryItem] = useState(null);
@@ -35,6 +38,30 @@ export default function Home() {
     window.alertTimeout = setTimeout(() => {
       setAlertMessage(null);
     }, 3000);
+  };
+
+  // Function to toggle mute state
+  const toggleMute = () => {
+    if (audioRef.current) {
+      const newMuteState = !isMuted;
+      audioRef.current.muted = newMuteState;
+      setIsMuted(newMuteState);
+    }
+  };
+
+  // Function to start background music
+  const startBackgroundMusic = () => {
+    if (audioRef.current && !isMusicPlaying) {
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsMusicPlaying(true);
+          audioRef.current.muted = isMuted; // Apply current mute state
+        })
+        .catch((error) => {
+          console.error("Audio playback failed:", error);
+        });
+    }
   };
 
   // Handle click on an object with key check
@@ -90,7 +117,7 @@ export default function Home() {
     },
     1: {
       videoSrc: "rooms/Red_Flicker.mp4",
-      transitionVideoSrc: "rooms/Zoom_Out.mp4",
+      transitionVideoSrc: "rooms/Exit_Room.mp4",
       objects: room1Objects,
     },
     2: {
@@ -100,17 +127,65 @@ export default function Home() {
     },
   };
 
-  // Clear any active alert timeout when component unmounts
-  useEffect(() => {
-    return () => {
-      if (window.alertTimeout) {
-        clearTimeout(window.alertTimeout);
-      }
-    };
-  }, []);
-
   return (
-    <main>
+    <main onClick={startBackgroundMusic}>
+      {/* Background Music */}
+      <audio
+        ref={audioRef}
+        src="audio/mysterious-music.mp3"
+        loop
+        preload="auto"
+        muted={isMuted}
+      />
+
+      {/* Mute button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent triggering startBackgroundMusic
+          toggleMute();
+        }}
+        className="fixed top-4 right-4 z-50 p-2 bg-gray-800 bg-opacity-70 text-white rounded-full hover:bg-opacity-90 transition-all"
+        aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+      >
+        {isMuted ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="size-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+            />
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="size-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+            />
+          </svg>
+        )}
+      </button>
+
       {/* Alert component positioned above the game window */}
       <Alert message={alertMessage} type={alertType} />
 
@@ -161,7 +236,10 @@ export default function Home() {
                 </p>
               </div>
               <button
-                onClick={handleNextRoom}
+                onClick={() => {
+                  startBackgroundMusic();
+                  handleNextRoom();
+                }}
                 className="px-8 py-4 bg-gray-600 text-white text-2xl font-bold rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Start Game
@@ -180,10 +258,10 @@ export default function Home() {
                   onClick={() => handleObjectClick(obj)}
                   style={{
                     position: "absolute",
-                    top: obj.top,
-                    left: obj.left,
-                    width: obj.width,
-                    height: obj.height,
+                    top: obj.position.top,
+                    left: obj.position.left,
+                    width: obj.position.width,
+                    height: obj.position.height,
                     background: "transparent",
                     border: "none",
                     cursor: "pointer",
@@ -226,6 +304,7 @@ export default function Home() {
             setInventory([...inventory, item]);
             showAlert(`Added ${item.name} to inventory!`, "success");
           }}
+          handleNextRoom={handleNextRoom}
         />
       )}
 
