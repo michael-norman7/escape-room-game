@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Modal from "./components/Modal";
 import InventoryDetailModal from "./components/InventoryDetailModal";
 import Alert from "./components/Alert";
-import { inventoryItems, room1Objects } from "./data/roomObjects";
+import { roomData } from "./data/roomData";
 
 export default function Home() {
   const [currentRoom, setCurrentRoom] = useState(0);
@@ -90,42 +90,19 @@ export default function Home() {
       setTransition(true);
       setTimeout(() => {
         setTransition(false);
-        setCurrentRoom(
-          Math.max((currentRoom + 1) % Object.keys(roomData).length, 1)
-        );
+        setCurrentRoom(currentRoom + 1);
         console.log("Transitioned to next room");
       }, 7000);
     } else {
       if (currentRoom === 0) {
         // Start the game
         setCurrentRoom(1);
-      } else if (currentRoom < Object.keys(roomData).length - 1) {
-        console.log("Next room");
-        setCurrentRoom(currentRoom + 1);
       } else {
-        console.log("First room");
-        setCurrentRoom(1);
+        // Simply move to next room if no transition video
+        setCurrentRoom(currentRoom + 1);
       }
     }
   }
-
-  const roomData = {
-    0: {
-      videoSrc: "rooms/start_page.mp4",
-      transitionVideoSrc: "",
-      objects: [],
-    },
-    1: {
-      videoSrc: "rooms/Red_Flicker.mp4",
-      transitionVideoSrc: "rooms/Exit_Room.mp4",
-      objects: room1Objects,
-    },
-    2: {
-      videoSrc: "rooms/Red_Green_Flicker.mp4",
-      transitionVideoSrc: "rooms/Exit_Room.mp4",
-      objects: [],
-    },
-  };
 
   return (
     <main onClick={startBackgroundMusic}>
@@ -205,6 +182,14 @@ export default function Home() {
               />
               Your browser does not support the video tag.
             </video>
+          ) : roomData[currentRoom].videoSrc.match(
+              /\.(jpg|jpeg|png|gif|webp)$/i
+            ) ? (
+            <img
+              src={roomData[currentRoom].videoSrc}
+              alt={`Room ${currentRoom} background`}
+              className="object-cover w-full h-full"
+            />
           ) : (
             <video
               key={roomData[currentRoom].videoSrc}
@@ -219,7 +204,7 @@ export default function Home() {
             </video>
           )}
 
-          {/* Overlay for the first room */}
+          {/* Overlay for the start room */}
           {currentRoom === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="p-8 bg-black bg-opacity-70 rounded-lg text-white max-w-2xl text-center mb-8">
