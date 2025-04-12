@@ -6,7 +6,7 @@ import Alert from "./components/Alert";
 import { roomData } from "./data/roomData";
 
 export default function Home() {
-  const [currentRoom, setCurrentRoom] = useState(2);
+  const [currentRoom, setCurrentRoom] = useState(0);
   const [transition, setTransition] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -276,7 +276,9 @@ export default function Home() {
       {currentRoom !== 0 && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-300 rounded-lg w-[700px] h-20">
           <div className="flex items-center justify-center h-full space-x-4">
-            {inventory.map((item, index) => (
+            {inventory
+              .filter(item => item.imageSrc)
+              .map((item, index) => (
               <div key={index} className="relative group">
                 <img
                   src={item.imageSrc}
@@ -300,6 +302,7 @@ export default function Home() {
           content={activeObject.content}
           onClose={() => setActiveObject(null)}
           inventory={inventory}
+          setInventory={setInventory}
           addToInventory={(item) => {
             setInventory([...inventory, item]);
             showAlert(`Added ${item.name} to inventory!`, "success");

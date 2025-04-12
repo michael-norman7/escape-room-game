@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Alert from "./Alert";
 
 export default function Modal({
@@ -7,10 +7,37 @@ export default function Modal({
   content,
   onClose,
   inventory,
+  setInventory,
   addToInventory,
   handleNextRoom,
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
+  const [autoCollectProcessed, setAutoCollectProcessed] = useState(false);
+
+  // Handle auto-collect puzzles
+  useEffect(() => {
+    if (
+      content.puzzle?.type === "auto_collect" &&
+      !content.puzzle.solved &&
+      !autoCollectProcessed
+    ) {
+      if (content.puzzle.reward) {
+        const rewards = Array.isArray(content.puzzle.reward)
+          ? content.puzzle.reward
+          : [content.puzzle.reward];
+
+        rewards.forEach((item) => {
+          if (!item.claimed) {
+            item.claimed = true;
+            // Add to inventory silently without showing alert
+            setInventory((prev) => [...prev, item]);
+          }
+        });
+      }
+      content.puzzle.solved = true;
+      setAutoCollectProcessed(true);
+    }
+  }, [content.puzzle, autoCollectProcessed]);
 
   // Helper function to consume keys from inventory
   const consumeKeys = (puzzle) => {
@@ -112,6 +139,11 @@ export default function Modal({
             />
           </div>
         )}
+
+        {/* Auto Collect Puzzle */}
+        {content.puzzle &&
+          content.puzzle.type === "auto_collect" &&
+          content.puzzle.solved && <></>}
 
         {/* Terminal Security Puzzle */}
         {content.puzzle &&

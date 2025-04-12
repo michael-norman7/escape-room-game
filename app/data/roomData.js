@@ -30,6 +30,16 @@ export const inventoryItems = {
     imageSrc: "items/mysterious_piece.png",
     claimed: false,
   },
+  "Security Clearance": {
+    name: "Security Clearance",
+    imageSrc: "items/key_card.png",
+    claimed: false,
+  },
+  "Paper Clue": {
+    name: "Paper Clue",
+    imageSrc: "",
+    claimed: false,
+  },
 };
 
 export const room1Objects = [
@@ -229,26 +239,54 @@ export const room2StartObjects = [
 
 export const room2MiddleObjects = [
   {
-    id: "lockedBoxDisplayCase",
-    position: { top: "420px", left: "230px", width: "110px", height: "90px" },
-    title: "Left Display Case",
+    id: "statueBase",
+    position: { top: "440px", left: "610px", width: "105px", height: "100px" },
+    title: "Statue Base",
+    key: "Security Clearance",
+    hint: "The statue appears to have a panel on the bottom but it is sealed tight and locked out by the security system.",
     content: {
       text: "",
-      image: "puzzles/display_case.png",
+      image: "",
+      puzzle: {},
+    },
+  },
+  {
+    id: "rightDisplayCase",
+    position: { top: "320px", left: "1150px", width: "130px", height: "270px" },
+    title: "Right Display Case",
+    content: {
+      text: "",
+      image: "puzzles/paper_on_right_wall.png",
       puzzle: {
-        type: "locked_box",
+        type: "auto_collect",
         solved: false,
-        key: "Safe Key",
-        consume_key: true,
-        id: "puzzle1_box",
-        position: {
-          top: "315px",
-          left: "150px",
-          width: "235px",
-          height: "180px",
-        },
-        hint: "You need a key to open this box.",
-        reward: inventoryItems["Cipher"],
+        id: "paper_clue",
+        reward: inventoryItems["Paper Clue"],
+      },
+    },
+  },
+  {
+    id: "painting",
+    position: { top: "310px", left: "10px", width: "140px", height: "270px" },
+    title: "Painting",
+    hiddenBy: inventoryItems["Paper Clue"],
+    content: {
+      text: "",
+      image: "puzzles/BigBen.png",
+    },
+  },
+  {
+    id: "keyPad",
+    position: { top: "530px", left: "910px", width: "60px", height: "90px" },
+    title: "Keypad",
+    content: {
+      text: "",
+      puzzle: {
+        type: "4 digit code",
+        id: "keypad_puzzle",
+        code: "1200",
+        solved: false,
+        reward: inventoryItems["Security Clearance"],
       },
     },
   },
