@@ -1,25 +1,34 @@
 export const inventoryItems = {
-  "Safe Key": { name: "Safe Key", imageSrc: "items/key.png" },
+  "Safe Key": {
+    name: "Safe Key",
+    imageSrc: "items/key.png",
+    claimed: false,
+  },
   Cipher: {
     name: "Cipher",
     imageSrc: "items/note.png",
     detailImageSrc: "items/cipher_decoder.png",
+    claimed: false,
   },
   "Bionic Eye": {
     name: "Bionic Eye",
     imageSrc: "items/bionic_eye.png",
+    claimed: false,
   },
   Crowbar: {
     name: "Crowbar",
     imageSrc: "items/crowbar.png",
+    claimed: false,
   },
   "Key Card": {
     name: "Key Card",
     imageSrc: "items/key_card.png",
+    claimed: false,
   },
   "Mysterious Piece": {
     name: "Mysterious Piece",
     imageSrc: "items/mysterious_piece.png",
+    claimed: false,
   },
 };
 
@@ -35,6 +44,7 @@ export const room1Objects = [
         type: "locked_box",
         solved: false,
         key: "Safe Key",
+        consume_key: true,
         id: "puzzle1_box",
         position: {
           top: "315px",
@@ -58,6 +68,7 @@ export const room1Objects = [
         type: "locked_box",
         solved: false,
         key: "none",
+        consume_key: false,
         id: "puzzle2_box",
         position: {
           top: "150px",
@@ -81,6 +92,7 @@ export const room1Objects = [
         type: "locked_box",
         solved: false,
         key: "Mysterious Piece",
+        consume_key: true,
         id: "statue",
         position: {
           top: "165px",
@@ -105,7 +117,8 @@ export const room1Objects = [
       puzzle: {
         type: "locked_box",
         solved: false,
-        key: null,
+        key: "Crowbar",
+        consume_key: true,
         id: "books",
         position: {
           top: "325px",
@@ -130,6 +143,7 @@ export const room1Objects = [
         code: "6396",
         colors: ["blue", "green", "orange", "red"],
         solved: false,
+        consume_key: false,
         reward: [
           inventoryItems["Safe Key"],
           inventoryItems["Mysterious Piece"],
@@ -149,6 +163,7 @@ export const room1Objects = [
         type: "locked_box",
         solved: true,
         key: null,
+        consume_key: false,
         id: "crowbar",
         position: { top: "0px", left: "0px", width: "0px", height: "0px" },
         hint: "",
@@ -166,6 +181,7 @@ export const room1Objects = [
       puzzle: {
         type: "terminal_security",
         solved: false,
+        consume_key: true,
         requiredItems: ["Bionic Eye", "Key Card"],
         messages: {
           noBionicEyeNoKeyCard:
@@ -205,6 +221,7 @@ export const room2StartObjects = [
         type: "locked_box",
         solved: false,
         key: "Safe Key",
+        consume_key: true,
         id: "puzzle1_box",
         position: {
           top: "315px",
@@ -231,6 +248,7 @@ export const room2MiddleObjects = [
         type: "locked_box",
         solved: false,
         key: "Safe Key",
+        consume_key: true,
         id: "puzzle1_box",
         position: {
           top: "315px",
@@ -257,6 +275,7 @@ export const room2EndObjects = [
         type: "locked_box",
         solved: false,
         key: "Safe Key",
+        consume_key: true,
         id: "puzzle1_box",
         position: {
           top: "315px",

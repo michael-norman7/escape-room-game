@@ -11,16 +11,37 @@ export default function Modal({
   handleNextRoom,
 }) {
   const [showPuzzle, setShowPuzzle] = useState(true);
+
+  // Helper function to consume keys from inventory
+  const consumeKeys = (puzzle) => {
+    if (puzzle.consume_key) {
+      if (puzzle.type === "terminal_security" && puzzle.requiredItems) {
+        puzzle.requiredItems.forEach((item) => {
+          const itemIndex = inventory.findIndex(
+            (invItem) => invItem.name === item
+          );
+          if (itemIndex !== -1) {
+            inventory.splice(itemIndex, 1);
+          }
+        });
+      } else if (puzzle.key) {
+        const keyIndex = inventory.findIndex(
+          (item) => item.name === puzzle.key
+        );
+        if (keyIndex !== -1) {
+          inventory.splice(keyIndex, 1);
+        }
+      }
+    }
+  };
+
   function SolvedPuzzleReward({ reward, addToInventory }) {
-    // Handle null or undefined reward
     if (!reward) {
       return <></>;
     }
 
-    // Convert single reward to array if it's not already
     const rewards = Array.isArray(reward) ? reward : [reward];
 
-    console.log("Rewards:", rewards);
     return (
       <div className="bg-white p-6 rounded-lg text-center">
         <h3 className="text-xl mb-4">You found something!</h3>
@@ -28,15 +49,14 @@ export default function Modal({
         <div className="flex flex-wrap justify-center gap-4">
           {rewards.map((item, index) => (
             <div key={index} className="flex flex-col items-center">
-              {!inventory.some(
-                (inventoryItem) => inventoryItem.name === item.name
-              ) ? (
+              {!item.claimed ? (
                 <>
                   <img
                     src={item.imageSrc}
                     alt={item.name}
                     className="w-24 h-24 object-contain cursor-pointer hover:opacity-80 bg-slate-300 rounded-lg"
                     onClick={() => {
+                      item.claimed = true;
                       addToInventory(item);
                     }}
                   />
@@ -107,6 +127,7 @@ export default function Modal({
               puzzle={content.puzzle}
               inventory={inventory}
               solvePuzzle={() => {
+                consumeKeys(content.puzzle);
                 content.puzzle.solved = true;
                 setShowPuzzle(false); // Force re-render
               }}
@@ -127,6 +148,7 @@ export default function Modal({
             <FourDigitCodePuzzle
               puzzle={content.puzzle}
               solvePuzzle={() => {
+                consumeKeys(content.puzzle);
                 content.puzzle.solved = true;
                 setShowPuzzle(false); // Force re-render
               }}
@@ -149,9 +171,11 @@ export default function Modal({
                 inventory.some((item) => item.name === content.puzzle.key)
               }
               solvePuzzle={() => {
+                consumeKeys(content.puzzle);
                 content.puzzle.solved = true;
                 setShowPuzzle(false); // Force re-render
               }}
+              inventory={inventory}
             />
           ))}
       </div>
@@ -159,7 +183,13 @@ export default function Modal({
   );
 }
 
-function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoom }) {
+function TerminalPuzzle({
+  puzzle,
+  inventory,
+  solvePuzzle,
+  onClose,
+  handleNextRoom,
+}) {
   const hasBionicEye = inventory.some((item) => item.name === "Bionic Eye");
   const hasKeyCard = inventory.some((item) => item.name === "Key Card");
   const [eyeAccepted, setEyeAccepted] = useState(false);
@@ -183,6 +213,13 @@ function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoo
       if (hasBionicEye) {
         setAlertMessage("The eye scanner glows green with approval.");
         setEyeAccepted(true);
+        // Remove the bionic eye from inventory when used
+        const bionicEyeIndex = inventory.findIndex(
+          (item) => item.name === "Bionic Eye"
+        );
+        if (bionicEyeIndex !== -1) {
+          inventory.splice(bionicEyeIndex, 1);
+        }
       } else {
         setAlertMessage("The optical scanner needs a compatible bionic eye.");
       }
@@ -190,6 +227,13 @@ function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoo
       if (hasKeyCard) {
         setAlertMessage("The card scanner accepts your key card.");
         setCardAccepted(true);
+        // Remove the card scanner from inventory when used
+        const keyCardIndex = inventory.findIndex(
+          (item) => item.name === "Key Card"
+        );
+        if (keyCardIndex !== -1) {
+          inventory.splice(keyCardIndex, 1);
+        }
       } else {
         setAlertMessage("The card scanner is waiting for a key card.");
       }
@@ -200,12 +244,11 @@ function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoo
   };
 
   const handleTerminalAccess = () => {
-    solvePuzzle(); // Mark puzzle as solved
-    
-    // Short delay before closing modal and transitioning
+    solvePuzzle();
+
     setTimeout(() => {
-      onClose(); // Close the modal
-      handleNextRoom(); // Trigger room transition
+      onClose();
+      handleNextRoom();
     }, 500);
   };
 
@@ -261,21 +304,23 @@ function TerminalPuzzle({ puzzle, inventory, solvePuzzle, onClose, handleNextRoo
   );
 }
 
-function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle }) {
+function LockedBoxPuzzle({ puzzle, hasKey, solvePuzzle, inventory }) {
   const [showAlert, setShowAlert] = useState(false);
+
+  const handlePuzzleSolve = () => {
+    if (hasKey) {
+      solvePuzzle();
+    } else {
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
 
   return (
     <div className="mt-6 flex flex-col items-center">
       <button
         key={puzzle.id}
-        onClick={() => {
-          if (hasKey) {
-            solvePuzzle();
-          } else {
-            setShowAlert(true);
-            setTimeout(() => setShowAlert(false), 3000);
-          }
-        }}
+        onClick={handlePuzzleSolve}
         style={{
           position: "absolute",
           top: puzzle.position.top,
