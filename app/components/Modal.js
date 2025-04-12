@@ -29,7 +29,7 @@ export default function Modal({
           (item) => item.name === puzzle.key
         );
         if (keyIndex !== -1) {
-          inventory.splice(keyIndex, 1);
+          inventory.splice(itemIndex, 1);
         }
       }
     }
@@ -178,6 +178,26 @@ export default function Modal({
               inventory={inventory}
             />
           ))}
+
+        {/* Wire Puzzle */}
+        {content.puzzle &&
+          content.puzzle.type === "wire_puzzle" &&
+          (content.puzzle.solved ? (
+            <div className="mt-6 text-center">
+              <div className="p-4 bg-green-100 text-green-800 rounded-lg">
+                Puzzle solved!
+              </div>
+            </div>
+          ) : (
+            <WirePuzzle
+              puzzle={content.puzzle}
+              solvePuzzle={() => {
+                content.puzzle.solved = true;
+                setShowPuzzle(false);
+                handleNextRoom();
+              }}
+            />
+          ))}
       </div>
     </div>
   );
@@ -213,13 +233,6 @@ function TerminalPuzzle({
       if (hasBionicEye) {
         setAlertMessage("The eye scanner glows green with approval.");
         setEyeAccepted(true);
-        // Remove the bionic eye from inventory when used
-        const bionicEyeIndex = inventory.findIndex(
-          (item) => item.name === "Bionic Eye"
-        );
-        if (bionicEyeIndex !== -1) {
-          inventory.splice(bionicEyeIndex, 1);
-        }
       } else {
         setAlertMessage("The optical scanner needs a compatible bionic eye.");
       }
@@ -227,13 +240,6 @@ function TerminalPuzzle({
       if (hasKeyCard) {
         setAlertMessage("The card scanner accepts your key card.");
         setCardAccepted(true);
-        // Remove the card scanner from inventory when used
-        const keyCardIndex = inventory.findIndex(
-          (item) => item.name === "Key Card"
-        );
-        if (keyCardIndex !== -1) {
-          inventory.splice(keyCardIndex, 1);
-        }
       } else {
         setAlertMessage("The card scanner is waiting for a key card.");
       }
@@ -443,6 +449,146 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
       </button>
 
       {showAlert && <Alert message="Incorrect code. Try again." type="error" />}
+    </div>
+  );
+}
+
+function WirePuzzle({ puzzle, solvePuzzle }) {
+  const [connections, setConnections] = useState({});
+  const [selectedWire, setSelectedWire] = useState(null);
+  const [showAlertMessage, setShowAlertMessage] = useState(null);
+  const colors = ["red", "blue", "yellow", "green"];
+
+  const wireStyle = (color) => ({
+    width: "40px",
+    height: "40px",
+    backgroundColor: color,
+    margin: "40px", // Increased from 20px
+    cursor: "pointer",
+    borderRadius: "50%", // Make it a circle
+    border: "2px solid rgba(255,255,255,0.2)", // Add a subtle border
+  });
+
+  const handleWireClick = (side, color, index) => {
+    if (!selectedWire) {
+      setSelectedWire({ side, color, index });
+    } else {
+      if (selectedWire.side !== side) {
+        // Attempting to make a connection
+        if (selectedWire.color === color && !connections[color]) {
+          // Correct connection
+          const startIndex =
+            selectedWire.side === "left" ? selectedWire.index : index;
+          const endIndex =
+            selectedWire.side === "left" ? index : selectedWire.index;
+          setConnections({
+            ...connections,
+            [color]: { connected: true, startIndex, endIndex },
+          });
+
+          // Check if all wires are connected
+          if (Object.keys(connections).length === 3) {
+            setTimeout(() => {
+              setShowAlertMessage("The lights came on!");
+              setTimeout(() => {
+                setShowAlertMessage(null);
+                solvePuzzle();
+              }, 1000);
+            }, 500);
+          }
+        }
+      }
+      setSelectedWire(null);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="flex justify-between items-center p-8 bg-black rounded-lg relative"
+        style={{ minHeight: "400px", width: "700px" }}
+      >
+        {/* Connection lines */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ zIndex: 1 }}
+        >
+          {Object.entries(connections).map(([color, connection]) => {
+            if (!connection.connected) return null;
+
+            // Calculate wire positions - adjusted for increased spacing
+            const startY = 90 + connection.startIndex * 80; // Adjusted from 50 + index * 100
+            const endY = 90 + connection.endIndex * 80;
+
+            return (
+              <line
+                key={color}
+                x1="90" // Adjusted for new circle size
+                y1={startY}
+                x2="610" // Adjusted for new circle size
+                y2={endY}
+                stroke={color}
+                strokeWidth="8"
+              />
+            );
+          })}
+        </svg>
+
+        {/* Left wires */}
+        <div className="left-wires relative z-10">
+          {colors.map((color, index) => (
+            <div
+              key={`left-${color}`}
+              style={{
+                ...wireStyle(color),
+                opacity: connections[color] ? 0.5 : 1,
+                border:
+                  selectedWire?.side === "left" && selectedWire?.color === color
+                    ? "3px solid white"
+                    : "2px solid rgba(255,255,255,0.2)",
+                boxShadow:
+                  selectedWire?.side === "left" && selectedWire?.color === color
+                    ? "0 0 10px rgba(255,255,255,0.5)"
+                    : "none",
+              }}
+              onClick={() =>
+                !connections[color] && handleWireClick("left", color, index)
+              }
+            />
+          ))}
+        </div>
+
+        {/* Right wires */}
+        <div className="right-wires relative z-10">
+          {colors
+            .slice()
+            .reverse()
+            .map((color, index) => (
+              <div
+                key={`right-${color}`}
+                style={{
+                  ...wireStyle(color),
+                  opacity: connections[color] ? 0.5 : 1,
+                  border:
+                    selectedWire?.side === "right" &&
+                    selectedWire?.color === color
+                      ? "3px solid white"
+                      : "2px solid rgba(255,255,255,0.2)",
+                  boxShadow:
+                    selectedWire?.side === "right" &&
+                    selectedWire?.color === color
+                      ? "0 0 10px rgba(255,255,255,0.5)"
+                      : "none",
+                }}
+                onClick={() =>
+                  !connections[color] && handleWireClick("right", color, index)
+                }
+              />
+            ))}
+        </div>
+      </div>
+
+      {showAlertMessage && <Alert message={showAlertMessage} type="success" />}
     </div>
   );
 }

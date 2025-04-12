@@ -211,26 +211,17 @@ export const room1Objects = [
 
 export const room2StartObjects = [
   {
-    id: "lockedBoxDisplayCase",
-    position: { top: "420px", left: "230px", width: "110px", height: "90px" },
-    title: "Left Display Case",
+    id: "electricalPanel",
+    position: { top: "410px", left: "910px", width: "180px", height: "350px" },
+    title: "Electrical Panel",
     content: {
-      text: "",
-      image: "puzzles/display_case.png",
+      text: "The room is dark. This electrical panel seems to be missing some connections...",
       puzzle: {
-        type: "locked_box",
+        type: "wire_puzzle",
         solved: false,
-        key: "Safe Key",
-        consume_key: true,
-        id: "puzzle1_box",
-        position: {
-          top: "315px",
-          left: "150px",
-          width: "235px",
-          height: "180px",
-        },
-        hint: "You need a key to open this box.",
-        reward: inventoryItems["Cipher"],
+        consume_key: false,
+        id: "wire_puzzle_1",
+        hint: "Match the colored wires to restore power",
       },
     },
   },
@@ -295,25 +286,30 @@ export const roomData = {
     videoSrc: "rooms/start_page.mp4",
     transitionVideoSrc: "",
     objects: [],
+    remove_item: [],
   },
   1: {
     videoSrc: "rooms/Room1.mp4",
     transitionVideoSrc: "rooms/Room1Transition.mp4",
     objects: room1Objects,
+    remove_item: [inventoryItems["Cipher"]],
   },
   2: {
     videoSrc: "rooms/Room2Start.png",
     transitionVideoSrc: "",
     objects: room2StartObjects,
+    remove_item: [],
   },
   3: {
     videoSrc: "rooms/Room2Middle.png",
     transitionVideoSrc: "rooms/Room2MiddleEndTransition.mp4",
     objects: room2MiddleObjects,
+    remove_item: [],
   },
   4: {
     videoSrc: "rooms/Room2End.png",
     transitionVideoSrc: "",
     objects: room2EndObjects,
+    remove_item: [],
   },
 };

@@ -6,7 +6,7 @@ import Alert from "./components/Alert";
 import { roomData } from "./data/roomData";
 
 export default function Home() {
-  const [currentRoom, setCurrentRoom] = useState(0);
+  const [currentRoom, setCurrentRoom] = useState(2);
   const [transition, setTransition] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -83,6 +83,21 @@ export default function Home() {
     if (transition) return -1;
 
     setActiveObject(null);
+
+    // Remove items specified in current room's remove_item array
+    if (
+      roomData[currentRoom].remove_item &&
+      roomData[currentRoom].remove_item.length > 0
+    ) {
+      setInventory((prevInventory) =>
+        prevInventory.filter(
+          (invItem) =>
+            !roomData[currentRoom].remove_item.some(
+              (removeItem) => removeItem.name === invItem.name
+            )
+        )
+      );
+    }
 
     // transition
     if (roomData[currentRoom].transitionVideoSrc !== "") {
