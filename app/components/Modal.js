@@ -56,7 +56,7 @@ export default function Modal({
           (item) => item.name === puzzle.key
         );
         if (keyIndex !== -1) {
-          inventory.splice(itemIndex, 1);
+          inventory.splice(keyIndex, 1);
         }
       }
     }
@@ -250,11 +250,11 @@ function TerminalPuzzle({
   const [alertMessage, setAlertMessage] = useState("");
 
   let messageToShow = "";
-  if (hasBionicEye && hasKeyCard) {
+  if (eyeAccepted && cardAccepted) {
     messageToShow = puzzle.messages.success;
-  } else if (hasBionicEye && !hasKeyCard) {
+  } else if (eyeAccepted && !cardAccepted) {
     messageToShow = puzzle.messages.bionicEyeNoKeyCard;
-  } else if (!hasBionicEye && hasKeyCard) {
+  } else if (!eyeAccepted && cardAccepted) {
     messageToShow = puzzle.messages.noBionicEyeKeyCard;
   } else {
     messageToShow = puzzle.messages.noBionicEyeNoKeyCard;
