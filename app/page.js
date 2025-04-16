@@ -6,7 +6,7 @@ import Alert from "./components/Alert";
 import { roomData } from "./data/roomData";
 
 export default function Home() {
-  const [currentRoom, setCurrentRoom] = useState(0);
+  const [currentRoom, setCurrentRoom] = useState(2);
   const [transition, setTransition] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);

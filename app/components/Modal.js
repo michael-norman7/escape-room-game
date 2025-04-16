@@ -413,54 +413,62 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
 
   return (
     <div className="mt-6 flex flex-col items-center">
-      <div className="flex gap-6">
-        {digits.map((digit, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <button
-              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-              onClick={() => incrementDigit(index)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 15l7-7 7 7"
-                />
-              </svg>
-            </button>
-            <div
-              className={`flex items-center justify-center w-12 h-16 my-2 text-3xl font-bold ${getColorClass(puzzle.colors[index])} rounded`}
-            >
-              {digit}
-            </div>
-            <button
-              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-              onClick={() => decrementDigit(index)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-          </div>
-        ))}
+      <div className="flex gap-6 items-center">
+        {digits.map((digit, index) => {
+          const isColon = puzzle.colors.every((c) => !c || getColorClass(c) === "bg-gray-300") && index === 1;
+          return (
+            <>
+              <div key={`digit-${index}`} className="flex flex-col items-center">
+                <button
+                  className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                  onClick={() => incrementDigit(index)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 15l7-7 7 7"
+                    />
+                  </svg>
+                </button>
+                <div
+                  className={`flex items-center justify-center w-12 h-16 my-2 text-3xl font-bold ${getColorClass(puzzle.colors[index])} rounded`}
+                >
+                  {digit}
+                </div>
+                <button
+                  className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                  onClick={() => decrementDigit(index)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+              {isColon && (
+                <span key="colon" className="mx-[-12px] text-2xl font-bold">:</span>
+              )}
+            </>
+          );
+        })}
       </div>
 
       <button
@@ -490,6 +498,16 @@ function WirePuzzle({ puzzle, solvePuzzle }) {
   const [selectedWire, setSelectedWire] = useState(null);
   const [showAlertMessage, setShowAlertMessage] = useState(null);
   const colors = ["red", "blue", "yellow", "green"];
+
+  // Randomize right side colors once per mount
+  const [rightColors] = useState(() => {
+    const shuffled = [...colors];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  });
 
   const wireStyle = (color) => ({
     width: "40px",
@@ -592,31 +610,26 @@ function WirePuzzle({ puzzle, solvePuzzle }) {
 
         {/* Right wires */}
         <div className="right-wires relative z-10">
-          {colors
-            .slice()
-            .reverse()
-            .map((color, index) => (
-              <div
-                key={`right-${color}`}
-                style={{
-                  ...wireStyle(color),
-                  opacity: connections[color] ? 0.5 : 1,
-                  border:
-                    selectedWire?.side === "right" &&
-                    selectedWire?.color === color
-                      ? "3px solid white"
-                      : "2px solid rgba(255,255,255,0.2)",
-                  boxShadow:
-                    selectedWire?.side === "right" &&
-                    selectedWire?.color === color
-                      ? "0 0 10px rgba(255,255,255,0.5)"
-                      : "none",
-                }}
-                onClick={() =>
-                  !connections[color] && handleWireClick("right", color, index)
-                }
-              />
-            ))}
+          {rightColors.map((color, index) => (
+            <div
+              key={`right-${color}`}
+              style={{
+                ...wireStyle(color),
+                opacity: connections[color] ? 0.5 : 1,
+                border:
+                  selectedWire?.side === "right" && selectedWire?.color === color
+                    ? "3px solid white"
+                    : "2px solid rgba(255,255,255,0.2)",
+                boxShadow:
+                  selectedWire?.side === "right" && selectedWire?.color === color
+                    ? "0 0 10px rgba(255,255,255,0.5)"
+                    : "none",
+              }}
+              onClick={() =>
+                !connections[color] && handleWireClick("right", color, index)
+              }
+            />
+          ))}
         </div>
       </div>
 
