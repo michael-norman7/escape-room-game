@@ -244,6 +244,7 @@ export const room2MiddleObjects = [
     title: "Statue Base",
     key: "Security Clearance",
     hint: "The statue appears to have a panel on the bottom but it is sealed tight and locked out by the security system.",
+    triggersNextRoom: true,
     content: {
       text: "",
       image: "",
@@ -340,12 +341,12 @@ export const roomData = {
   },
   3: {
     videoSrc: "rooms/Room2Middle.png",
-    transitionVideoSrc: "rooms/Room2MiddleEndTransition.mp4",
+    transitionVideoSrc: "rooms/Room2EndTransition.mp4",
     objects: room2MiddleObjects,
     remove_item: [],
   },
   4: {
-    videoSrc: "rooms/Room2End.png",
+    videoSrc: "rooms/Room2EndTransition.mp4",
     transitionVideoSrc: "",
     objects: room2EndObjects,
     remove_item: [],

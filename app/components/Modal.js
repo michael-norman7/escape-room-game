@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState, useEffect } from "react";
 import Alert from "./Alert";
 
@@ -415,10 +416,13 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
     <div className="mt-6 flex flex-col items-center">
       <div className="flex gap-6 items-center">
         {digits.map((digit, index) => {
-          const isColon = puzzle.colors.every((c) => !c || getColorClass(c) === "bg-gray-300") && index === 1;
+          const isColon =
+            puzzle.colors.every(
+              (c) => !c || getColorClass(c) === "bg-gray-300"
+            ) && index === 1;
           return (
-            <>
-              <div key={`digit-${index}`} className="flex flex-col items-center">
+            <React.Fragment key={`digit-colon-${index}`}>
+              <div className="flex flex-col items-center">
                 <button
                   className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
                   onClick={() => incrementDigit(index)}
@@ -464,9 +468,14 @@ function FourDigitCodePuzzle({ puzzle, solvePuzzle }) {
                 </button>
               </div>
               {isColon && (
-                <span key="colon" className="mx-[-12px] text-2xl font-bold">:</span>
+                <span
+                  key={`colon-${index}`}
+                  className="mx-[-12px] text-2xl font-bold"
+                >
+                  :
+                </span>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </div>
@@ -617,11 +626,13 @@ function WirePuzzle({ puzzle, solvePuzzle }) {
                 ...wireStyle(color),
                 opacity: connections[color] ? 0.5 : 1,
                 border:
-                  selectedWire?.side === "right" && selectedWire?.color === color
+                  selectedWire?.side === "right" &&
+                  selectedWire?.color === color
                     ? "3px solid white"
                     : "2px solid rgba(255,255,255,0.2)",
                 boxShadow:
-                  selectedWire?.side === "right" && selectedWire?.color === color
+                  selectedWire?.side === "right" &&
+                  selectedWire?.color === color
                     ? "0 0 10px rgba(255,255,255,0.5)"
                     : "none",
               }}

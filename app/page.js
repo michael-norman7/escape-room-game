@@ -6,7 +6,7 @@ import Alert from "./components/Alert";
 import { roomData } from "./data/roomData";
 
 export default function Home() {
-  const [currentRoom, setCurrentRoom] = useState(2);
+  const [currentRoom, setCurrentRoom] = useState(0);
   const [transition, setTransition] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -66,6 +66,17 @@ export default function Home() {
 
   // Handle click on an object with key check
   const handleObjectClick = (obj) => {
+    // Special case: clicking an object that triggers next room and requires a key
+    if (
+      currentRoom === 3 &&
+      obj.id === "statueBase" &&
+      obj.triggersNextRoom &&
+      hasKey("Security Clearance")
+    ) {
+      handleNextRoom();
+      return;
+    }
+
     // Check if the object directly requires a key
     if (obj.key && !hasKey(obj.key)) {
       showAlert(
@@ -245,6 +256,29 @@ export default function Home() {
                 Start Game
               </button>
             </div>
+          ) : currentRoom === 4 ? (
+            <>
+              <video
+                key={roomData[4].videoSrc}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="object-cover w-full h-full"
+              >
+                <source src={roomData[4].videoSrc} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="p-8 bg-black bg-opacity-70 rounded-lg text-white max-w-2xl text-center mb-8">
+                  <h1 className="text-4xl font-bold mb-4">Congratulations!</h1>
+                  <p className="text-2xl">
+                    You have solved all the puzzles and successfully escaped the
+                    museum.
+                  </p>
+                </div>
+              </div>
+            </>
           ) : (
             roomData[currentRoom].objects
               .filter(
@@ -277,20 +311,20 @@ export default function Home() {
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-300 rounded-lg w-[700px] h-20">
           <div className="flex items-center justify-center h-full space-x-4">
             {inventory
-              .filter(item => item.imageSrc)
+              .filter((item) => item.imageSrc)
               .map((item, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={item.imageSrc}
-                  alt={item.name}
-                  className="object-contain w-16 h-16 cursor-pointer"
-                  onClick={() => setActiveInventoryItem(item)}
-                />
-                <span className="absolute bottom-0 px-2 py-1 text-white transform -translate-x-1/2 bg-gray-700 rounded-lg opacity-0 text-s translate-y-3/4 left-1/2 group-hover:opacity-100 whitespace-nowrap">
-                  {item.name}
-                </span>
-              </div>
-            ))}
+                <div key={index} className="relative group">
+                  <img
+                    src={item.imageSrc}
+                    alt={item.name}
+                    className="object-contain w-16 h-16 cursor-pointer"
+                    onClick={() => setActiveInventoryItem(item)}
+                  />
+                  <span className="absolute bottom-0 px-2 py-1 text-white transform -translate-x-1/2 bg-gray-700 rounded-lg opacity-0 text-s translate-y-3/4 left-1/2 group-hover:opacity-100 whitespace-nowrap">
+                    {item.name}
+                  </span>
+                </div>
+              ))}
           </div>
         </div>
       )}
