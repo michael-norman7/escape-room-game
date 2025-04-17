@@ -343,7 +343,7 @@ export const roomData = {
     videoSrc: "rooms/Room2Middle.png",
     transitionVideoSrc: "rooms/Room2EndTransition.mp4",
     objects: room2MiddleObjects,
-    remove_item: [],
+    remove_item: [inventoryItems["Security Clearance"]],
   },
   4: {
     videoSrc: "rooms/Room2EndTransition.mp4",
